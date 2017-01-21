@@ -4,10 +4,10 @@
 
 package org.mybatis.pagination.dialect.db;
 
-import io.github.sparta.helpers.sql.SqlRemoveHelper;
 import org.mybatis.pagination.dialect.Dialect;
 import org.mybatis.pagination.helpers.CountHelper;
 import org.mybatis.pagination.helpers.StringHelper;
+import org.mybatis.pagination.util.SqlRemoveHelper;
 
 /**
  * Sql 2005的方言实现

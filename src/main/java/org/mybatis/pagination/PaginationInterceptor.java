@@ -7,8 +7,6 @@ package org.mybatis.pagination;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import io.github.sparta.helpers.reflex.Reflections;
-import io.github.sparta.helpers.sql.SqlRemoveHelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -27,6 +25,7 @@ import org.mybatis.pagination.dto.datatables.SearchField;
 import org.mybatis.pagination.dto.datatables.SortField;
 import org.mybatis.pagination.helpers.CountHelper;
 import org.mybatis.pagination.helpers.StringHelper;
+import org.mybatis.pagination.util.SqlRemoveHelper;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -49,17 +48,27 @@ import java.util.Properties;
         method = "query",
         args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
 public class PaginationInterceptor implements Interceptor, Serializable {
-    /** serial Version */
+    /**
+     * serial Version
+     */
     private static final long serialVersionUID = -6075937069117597841L;
     private static final ThreadLocal<Integer> PAGINATION_TOTAL = new ThreadLocal<Integer>();
     private static final ThreadLocal<PagingCriteria> PAGE_REQUEST = new ThreadLocal<PagingCriteria>();
-    /** logging */
+    /**
+     * logging
+     */
     private static final Log log = LogFactory.getLog(PaginationInterceptor.class);
-    /** mapped statement parameter index. */
+    /**
+     * mapped statement parameter index.
+     */
     private static final int MAPPED_STATEMENT_INDEX = 0;
-    /** sql id , in the mapper xml file. */
+    /**
+     * sql id , in the mapper xml file.
+     */
     private static String _sql_regex = "[*]";
-    /** DataBase dialect. */
+    /**
+     * DataBase dialect.
+     */
     protected Dialect _dialect;
 
     /**
@@ -83,7 +92,9 @@ public class PaginationInterceptor implements Interceptor, Serializable {
         return PAGE_REQUEST.get();
     }
 
-    /** clear total context. */
+    /**
+     * clear total context.
+     */
     public static void clean() {
         PAGE_REQUEST.remove();
         PAGINATION_TOTAL.remove();
@@ -108,8 +119,7 @@ public class PaginationInterceptor implements Interceptor, Serializable {
     /**
      * Sort and filter sql.
      *
-     *
-     * @param sql the sql
+     * @param sql            the sql
      * @param pagingCriteria the paging criteria
      * @return the string
      */
@@ -150,9 +160,9 @@ public class PaginationInterceptor implements Interceptor, Serializable {
     /**
      * Copy from bound sql.
      *
-     * @param ms the ms
+     * @param ms       the ms
      * @param boundSql the bound sql
-     * @param sql the sql
+     * @param sql      the sql
      * @return the bound sql
      */
     public static BoundSql copyFromBoundSql(MappedStatement ms, BoundSql boundSql,
@@ -297,7 +307,18 @@ public class PaginationInterceptor implements Interceptor, Serializable {
             dbms = DBMS.valueOf(dialect.toUpperCase());
             Preconditions.checkNotNull(dbms, "plugin not super on this database.");
         } else {
-            Dialect dialect1 = (Dialect) Reflections.instance(dialectClass);
+            Dialect dialect1 = null;
+            try {
+                Class dialetObject = Class.forName(dialectClass);
+                dialect1 = (Dialect) dialetObject.newInstance();
+            } catch (ClassNotFoundException e) {
+               log.error(dialectClass+" is not fond");
+            } catch (InstantiationException e) {
+                log.error(dialectClass+" can not instance",e);
+            } catch (IllegalAccessException e) {
+                log.error(dialectClass+" can not instance",e);
+            }
+
             Preconditions.checkNotNull(dialect1, "dialectClass is not found!");
             DialectClient.putEx(dialect1);
             dbms = DBMS.EX;

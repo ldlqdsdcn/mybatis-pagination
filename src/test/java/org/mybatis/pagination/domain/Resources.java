@@ -1,7 +1,5 @@
 package org.mybatis.pagination.domain;
 
-import com.google.common.base.Objects;
-
 import java.io.Serializable;
 
 public class Resources implements Serializable {
@@ -173,15 +171,15 @@ public class Resources implements Serializable {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("id", id)
-                .add("name", name)
-                .add("type", type)
-                .add("path", path)
-                .add("action", action)
-                .add("controller", controller)
-                .add("status", status)
-                .toString();
+        return "Resources{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", path='" + path + '\'' +
+                ", action='" + action + '\'' +
+                ", controller='" + controller + '\'' +
+                ", status=" + status +
+                '}';
     }
 
     /**
