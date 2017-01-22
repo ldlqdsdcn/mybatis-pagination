@@ -1,7 +1,5 @@
 package org.mybatis.pagination.util;
 
-import com.google.common.base.Preconditions;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,9 +50,16 @@ public class SqlRemoveHelper {
      * @return 删除掉的selcet的子句
      */
     public static String removeSelect(String sql) {
-        Preconditions.checkNotNull(sql);
+        if(sql==null)
+        {
+            throw new NullPointerException();
+        }
         int beginPos = indexOfByRegex(sql.toLowerCase(), FROM_REGEX);
-        Preconditions.checkArgument(beginPos != -1, " sql : " + sql + " must has a keyword 'from'");
+        if(beginPos == -1)
+        {
+            throw new IllegalArgumentException(" sql : " + sql + " must has a keyword 'from'");
+        }
+
         return sql.substring(beginPos);
     }
 
@@ -65,7 +70,10 @@ public class SqlRemoveHelper {
      * @return 去掉order by sql
      */
     public static String removeOrders(String sql) {
-        Preconditions.checkNotNull(sql);
+       if(sql==null)
+       {
+           throw new NullPointerException();
+       }
         Pattern p = Pattern.compile(ORDER_BY_REGEX, Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(sql);
         StringBuffer sb = new StringBuffer();
@@ -81,7 +89,10 @@ public class SqlRemoveHelper {
     }
 
     public static String removeXsqlBuilderOrders(String string) {
-        Preconditions.checkNotNull(string);
+        if(string==null)
+        {
+            throw new NullPointerException();
+        }
         Pattern p = Pattern.compile(XSQL_ORDER_BY_REGEX, Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(string);
         StringBuffer sb = new StringBuffer();

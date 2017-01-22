@@ -4,10 +4,9 @@
 
 package org.mybatis.pagination.dto.datatables;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 /**
  * <p>
@@ -68,8 +67,8 @@ public final class PagingCriteria {
         this.displaySize = displaySize;
         this.displayStart = displayStart;
         this.pageNumber = pageNumber;
-        this.searchFields = Lists.newArrayListWithCapacity(0);
-        this.sortFields = Lists.newArrayListWithCapacity(0);
+        this.searchFields = new ArrayList<SearchField>(0);
+        this.sortFields = new ArrayList<SortField>(0);
     }
 
     /**
@@ -88,7 +87,7 @@ public final class PagingCriteria {
         this.displaySize = displaySize;
         this.displayStart = displayStart;
         this.pageNumber = pageNumber;
-        this.searchFields = Lists.newArrayListWithCapacity(0);
+        this.searchFields = new ArrayList<SearchField>(0);
     }
 
     /**
@@ -107,7 +106,7 @@ public final class PagingCriteria {
         this.displaySize = displaySize;
         this.searchFields = searchFields;
         this.pageNumber = pageNumber;
-        this.sortFields = Lists.newArrayListWithCapacity(0);
+        this.sortFields = new ArrayList<SortField>(0);
     }
 
     /**
@@ -202,7 +201,7 @@ public final class PagingCriteria {
      */
     public List<SearchField> getSearchFields() {
         if (this.searchFields == null) {
-            return Lists.newArrayListWithCapacity(0);
+            return new ArrayList<SearchField>(0);
         }
         return Collections.unmodifiableList(searchFields);
     }
@@ -214,7 +213,7 @@ public final class PagingCriteria {
      */
     public List<SortField> getSortFields() {
         if (this.sortFields == null) {
-            return Lists.newArrayListWithCapacity(0);
+            return new ArrayList<SortField>(0);
         }
         return Collections.unmodifiableList(sortFields);
     }

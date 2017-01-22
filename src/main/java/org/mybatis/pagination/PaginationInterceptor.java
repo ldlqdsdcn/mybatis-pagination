@@ -4,9 +4,6 @@
 
 package org.mybatis.pagination;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -30,6 +27,7 @@ import org.mybatis.pagination.util.SqlRemoveHelper;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -128,7 +126,7 @@ public class PaginationInterceptor implements Interceptor, Serializable {
         boolean order = SqlRemoveHelper.containOrder(sql);
         final List<SearchField> searchFields = pagingCriteria.getSearchFields();
         if (searchFields != null && !searchFields.isEmpty()) {
-            List<String> where_field = Lists.newArrayList();
+            List<String> where_field = new ArrayList();
             for (SearchField searchField : searchFields) {
                 // fix inject sql
                 where_field.add(searchField.getField() + StringHelper.LIKE_CHAR + StringHelper.likeValue(searchField.getValue()));
@@ -141,22 +139,33 @@ public class PaginationInterceptor implements Interceptor, Serializable {
                 orderBy = CountHelper.SQL_ORDER + sqls[1];
             }
             sql = String.format((where ? CountHelper.OR_SQL_FORMAT : CountHelper.WHERE_SQL_FORMAT), sql
-                    , Joiner.on(CountHelper.OR_JOINER).skipNulls().join(where_field), orderBy);
+                    , joinString(CountHelper.OR_JOINER,where_field), orderBy);
         }
 
         final List<SortField> sortFields = pagingCriteria.getSortFields();
         if (sortFields != null && !sortFields.isEmpty()) {
-            List<String> field_order = Lists.newArrayList();
+            List<String> field_order = new ArrayList();
             for (SortField sortField : sortFields) {
                 field_order.add(sortField.getField() + StringHelper.BLANK_CHAR + sortField.getDirection().getDirection());
             }
             return String.format(order ? CountHelper.SQL_FORMAT : CountHelper.ORDER_SQL_FORMAT, sql
-                    , Joiner.on(StringHelper.DOT_CHAR).skipNulls().join(field_order));
+                    ,joinString(StringHelper.DOT_CHAR,field_order));
         }
 
         return sql;
     }
-
+    private static String joinString(String prefix,List<String> joinFieldList)
+    {
+        StringBuilder sb=new StringBuilder();
+        for(String field:joinFieldList)
+        {
+            if(field!=null)
+            {
+                sb.append(prefix).append(" ").append(field);
+            }
+        }
+        return sb.toString();
+    }
     /**
      * Copy from bound sql.
      *
@@ -303,9 +312,15 @@ public class PaginationInterceptor implements Interceptor, Serializable {
         DBMS dbms;
         if (StringHelper.isEmpty(dialectClass)) {
             String dialect = p.getProperty("dbms");
-            Preconditions.checkArgument(!StringHelper.isEmpty(dialect), "dialect property is not found!");
-            dbms = DBMS.valueOf(dialect.toUpperCase());
-            Preconditions.checkNotNull(dbms, "plugin not super on this database.");
+            if(dialect==null||dialect.isEmpty())
+            {
+                new IllegalArgumentException( "dialect property is not found!");
+            }
+             dbms = DBMS.valueOf(dialect.toUpperCase());
+            if(dbms==null)
+            {
+                new IllegalArgumentException( "plugin not super on this database.");
+            }
         } else {
             Dialect dialect1 = null;
             try {
@@ -318,8 +333,10 @@ public class PaginationInterceptor implements Interceptor, Serializable {
             } catch (IllegalAccessException e) {
                 log.error(dialectClass+" can not instance",e);
             }
-
-            Preconditions.checkNotNull(dialect1, "dialectClass is not found!");
+            if(dialect1==null)
+            {
+                new IllegalArgumentException( "dialectClass is not found!");
+            }
             DialectClient.putEx(dialect1);
             dbms = DBMS.EX;
         }

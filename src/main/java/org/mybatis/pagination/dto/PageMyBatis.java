@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 import org.mybatis.pagination.dto.datatables.PagingCriteria;
-import org.mybatis.pagination.mvc.DataTablesResultSet;
 
 /**
  * <p>
@@ -23,7 +20,7 @@ public class PageMyBatis<E> extends ArrayList<E> {
     /**
      * data connection.
      */
-    private final List<E> content = Lists.newArrayList();
+    private final List<E> content = new ArrayList();
     /**
      * pagination information
      */
@@ -67,22 +64,14 @@ public class PageMyBatis<E> extends ArrayList<E> {
         return total;
     }
 
-    /**
-     * Warp page.
-     *
-     * @return the page
-     */
-    public DataTablesResultSet<E> warp() {
-        return new DataTablesResultSet<E>(pageable == null ? 0 : pageable.getPageNumber(), this);
-    }
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("content", content)
-                .add("pageable", pageable)
-                .add("total", total)
-                .toString();
+        return "PageMyBatis{" +
+                "content=" + content +
+                ", pageable=" + pageable +
+                ", total=" + total +
+                '}';
     }
 
     @Override

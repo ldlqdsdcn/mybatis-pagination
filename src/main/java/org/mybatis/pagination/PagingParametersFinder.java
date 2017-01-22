@@ -4,13 +4,13 @@
 
 package org.mybatis.pagination;
 
-import com.google.common.collect.Maps;
-import org.apache.commons.beanutils.BeanMap;
+import org.mockito.cglib.beans.BeanMap;
 import org.mybatis.pagination.dto.datatables.PagingCriteria;
 import org.mybatis.pagination.helpers.StringHelper;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ public enum  PagingParametersFinder {
     /**
      * The search parameters by use of interim storage of results.
      */
-    private final Map<Object, String> search_map = Maps.newHashMap();
+    private final Map<Object, String> search_map = new HashMap();
 
     /**
      * private constructor
@@ -83,7 +83,7 @@ public enum  PagingParametersFinder {
         } else if (obj_class.isArray()) {
             pc = findCriteriaFromArray(object);
         } else {
-            BeanMap map = new BeanMap(object);
+            BeanMap map = BeanMap.create(object);
             return findCriteriaFromMap(map);
         }
 
